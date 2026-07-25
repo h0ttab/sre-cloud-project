@@ -9,5 +9,5 @@ terraform {
 
 provider "yandex" {
   service_account_key_file = pathexpand(var.service_account_key)
-  zone                     = "ru-central1-d"
+  zone                     = var.zone_a
 }
