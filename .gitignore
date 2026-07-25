@@ -1,0 +1,6 @@
+notes.md
+questions.md
+*key.json
+.terraform/
+*.tfstate
+*.tfstate.*
