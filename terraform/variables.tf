@@ -5,37 +5,49 @@ variable "service_account_key" {
 }
 
 variable "ssh_public_key" {
-  type = string
+  type        = string
   description = "SSH-key filepath"
-  default = "~/.ssh/yandex_cloud.pub"
+  default     = "~/.ssh/yandex_cloud.pub"
+}
+
+variable "cloud_id" {
+  type        = string
+  description = "Cloud ID"
+  sensitive   = true
+}
+
+variable "folder_id" {
+  type        = string
+  description = "Folder ID"
+  sensitive   = true
 }
 
 variable "ubuntu_family" {
-  type = string
+  type        = string
   description = "Ubuntu 24.04 Image family name"
-  default = "ubuntu-24-04-lts"
+  default     = "ubuntu-24-04-lts"
 }
 
 variable "zone_a" {
-  type = string
+  type        = string
   description = "YandexCloud availability zone RU-A"
-  default = "ru-central1-a"
+  default     = "ru-central1-a"
 }
 
 variable "zone_b" {
-  type = string
+  type        = string
   description = "YandexCloud availability zone RU-B"
-  default = "ru-central1-b"
+  default     = "ru-central1-b"
 }
 
 variable "cidr_a" {
-  type = list(string)
+  type        = list(string)
   description = "CIDR block for subnet A"
-  default = [ "10.10.1.0/24" ]
+  default     = ["10.10.1.0/24"]
 }
 
 variable "cidr_b" {
-  type = list(string)
+  type        = list(string)
   description = "CIDR block for subnet B"
-  default = [ "10.10.2.0/24" ]
+  default     = ["10.10.2.0/24"]
 }

@@ -1,12 +1,13 @@
 resource "yandex_vpc_network" "vpc_net" {
-  name = "cloud_network"
-
+  name      = "cloud_network"
+  folder_id = var.folder_id
   labels = {
     managed_by = "terraform"
   }
 }
 
 resource "yandex_vpc_subnet" "subnet_a" {
+  folder_id      = var.folder_id
   v4_cidr_blocks = var.cidr_a
   network_id     = yandex_vpc_network.vpc_net.id
   zone           = var.zone_a
@@ -18,6 +19,7 @@ resource "yandex_vpc_subnet" "subnet_a" {
 }
 
 resource "yandex_vpc_subnet" "subnet_b" {
+  folder_id      = var.folder_id
   v4_cidr_blocks = var.cidr_b
   network_id     = yandex_vpc_network.vpc_net.id
   zone           = var.zone_b
@@ -28,42 +30,37 @@ resource "yandex_vpc_subnet" "subnet_b" {
   }
 }
 
-resource "yandex_compute_instance" "app_node" {
-  name        = "app_server"
-  zone        = var.zone_a
-  platform_id = "standard-v3"
+resource "yandex_vpc_security_group" "sg_app" {
+  name        = "app-security-group"
+  description = "App node security group"
+  folder_id   = var.folder_id
+  network_id  = yandex_vpc_network.vpc_net.id
 
-  resources {
-    cores         = 2
-    core_fraction = 20
-    memory        = 2
+  ingress {
+    description    = "Allow SSH"
+    protocol       = "TCP"
+    port           = 22
+    v4_cidr_blocks = ["0.0.0.0/0"]
   }
 
-  boot_disk {
-    auto_delete = true
-    initialize_params {
-      image_id = data.yandex_compute_image.ubuntu_image.id
-      size     = 20
-      type     = "network-hdd"
-    }
+  ingress {
+    description    = "Allow HTTP:80"
+    protocol       = "TCP"
+    port           = 80
+    v4_cidr_blocks = ["0.0.0.0/0"]
   }
 
-  network_interface {
-    subnet_id = yandex_vpc_subnet.subnet_a.id
-    nat       = true
+  ingress {
+    description    = "Allow HTTP:8080"
+    protocol       = "TCP"
+    port           = 8080
+    v4_cidr_blocks = ["0.0.0.0/0"]
   }
 
-  scheduling_policy {
-    preemptible = true # https://yandex.cloud/ru/docs/compute/concepts/preemptible-vm
-  }
-
-  # YandexCloud required ssh-key to be passed in the format "{username}:{key_itself}"
-  metadata = {
-    ssh-keys = "ubuntu:${file(pathexpand(var.ssh_public_key))}" # "ubuntu" - username, ${} - formatted string
-  }
-
-  labels = {
-    managed_by = "terraform"
+  egress {
+    description    = "Allow ALL"
+    protocol       = "ANY"
+    v4_cidr_blocks = ["0.0.0.0/0"]
   }
 }
 
