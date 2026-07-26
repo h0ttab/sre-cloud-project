@@ -1,0 +1,42 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for role/docker
+- name: Install packages required for GPG key acquisition
+  apt:
+    pkg: "{{ required_packages.gpg }}"
+    state: present
+    update_cache: yes
+
+- name: Create keyrings directory
+  file:
+    state: directory
+    mode: 0755
+    dest: "{{ keyring_path }}"
+
+- name: Download GPG key
+  get_url:
+    url: "{{ docker_gpg_key_url }}"
+    dest: "{{ keyring_path }}/docker.asc"
+    mode: 0444
+
+- name: Install Docker APT repository
+  deb822_repository:
+    name: docker
+    types: deb
+    uris: "{{ docker_apt_repository_url }}"
+    suites: "{{ ansible_facts['distribution_release'] }}"
+    components: stable
+    architectures: amd64
+    signed_by: "{{ keyring_path }}/docker.asc"
+
+- name: Install Docker packages
+  apt:
+    name: "{{ required_packages.docker }}"
+    state: present
+    update_cache: yes
+
+- name: Ensure Docker service is running
+  service:
+    name: docker
+    state: started
+    enabled: yes

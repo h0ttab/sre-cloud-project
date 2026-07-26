@@ -1,0 +1,18 @@
+#SPDX-License-Identifier: MIT-0
+---
+# vars file for role/docker
+required_packages:
+  docker:
+    - docker-ce
+    - docker-ce-cli
+    - containerd.io
+    - docker-buildx-plugin
+    - docker-compose-plugin
+  gpg:
+    - ca-certificates
+    - curl
+
+keyring_path: /etc/apt/keyrings
+
+docker_apt_repository_url: https://download.docker.com/linux/ubuntu
+docker_gpg_key_url: https://download.docker.com/linux/ubuntu/gpg
