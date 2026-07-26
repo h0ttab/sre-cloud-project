@@ -1,5 +1,5 @@
 resource "yandex_compute_instance" "node" {
-  for_each    = var.vms
+  for_each    = local.vms
   name        = each.key
   folder_id   = var.folder_id
   zone        = var.zone_a
@@ -37,5 +37,22 @@ resource "yandex_compute_instance" "node" {
 
   labels = {
     managed_by = "terraform"
+  }
+}
+
+locals {
+  vms = {
+    "app-server" = {
+      cores              = 2
+      memory             = 2
+      disk_size          = 20
+      security_group_ids = [yandex_vpc_security_group.sg_app.id]
+    }
+    "ci-server" = {
+      cores              = 2
+      memory             = 4
+      disk_size          = 30
+      security_group_ids = [yandex_vpc_security_group.sg_app.id, yandex_vpc_security_group.sg_ci.id]
+    }
   }
 }

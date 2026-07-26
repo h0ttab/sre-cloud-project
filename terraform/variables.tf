@@ -57,29 +57,3 @@ variable "cidr_b" {
   description = "CIDR block for subnet B"
   default     = ["10.10.2.0/24"]
 }
-
-variable "vms" {
-  description = "Map of VM configurations"
-
-  type = map(object({
-    cores     = number
-    memory    = number
-    disk_size = number
-    security_group_ids = list(string)
-  }))
-
-  default = {
-    "app-server" = {
-      cores     = 2
-      memory    = 2
-      disk_size = 20
-      security_group_ids = [yandex_vpc_security_group.sg_app.id]
-    }
-    "ci-server" = {
-      cores     = 2
-      memory    = 4
-      disk_size = 30
-      security_group_ids = [yandex_vpc_security_group.sg_ci.id]
-    }
-  }
-}
