@@ -65,6 +65,7 @@ variable "vms" {
     cores     = number
     memory    = number
     disk_size = number
+    security_group_ids = list(string)
   }))
 
   default = {
@@ -72,11 +73,13 @@ variable "vms" {
       cores     = 2
       memory    = 2
       disk_size = 20
+      security_group_ids = [yandex_vpc_security_group.sg_app.id]
     }
     "ci-server" = {
       cores     = 2
       memory    = 4
       disk_size = 30
+      security_group_ids = [yandex_vpc_security_group.sg_ci.id]
     }
   }
 }

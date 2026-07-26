@@ -22,7 +22,7 @@ resource "yandex_compute_instance" "node" {
 
   network_interface {
     subnet_id          = yandex_vpc_subnet.subnet_a.id
-    security_group_ids = [yandex_vpc_security_group.sg_app.id]
+    security_group_ids = each.value.security_group_ids
     nat                = true
   }
 

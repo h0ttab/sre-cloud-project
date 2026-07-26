@@ -64,6 +64,20 @@ resource "yandex_vpc_security_group" "sg_app" {
   }
 }
 
+resource "yandex_vpc_security_group" "sg_ci" {
+  name = "ci-security-group"
+  description = "CI node security group"
+  folder_id   = var.folder_id
+  network_id  = yandex_vpc_network.vpc_net.id
+  
+  ingress {
+    description = "Allow Jenkins agents"
+    protocol = "TCP"
+    port = 50000
+    v4_cidr_blocks = merge(var.cidr_a, var.cidr_b)
+  }
+}
+
 resource "local_file" "ansible_inventory" {
   content  = <<-EOT
   [app_nodes]
