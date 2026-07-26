@@ -1,20 +1,21 @@
-resource "yandex_compute_instance" "app_node" {
-  name        = "app_server"
+resource "yandex_compute_instance" "node" {
+  for_each    = var.vms
+  name        = each.key
   folder_id   = var.folder_id
   zone        = var.zone_a
   platform_id = "standard-v3"
 
   resources {
-    cores         = 2
+    cores         = each.value.cores
     core_fraction = 20
-    memory        = 2
+    memory        = each.value.memory
   }
 
   boot_disk {
     auto_delete = true
     initialize_params {
       image_id = data.yandex_compute_image.ubuntu_image.id
-      size     = 20
+      size     = each.value.disk_size
       type     = "network-hdd"
     }
   }

@@ -57,3 +57,26 @@ variable "cidr_b" {
   description = "CIDR block for subnet B"
   default     = ["10.10.2.0/24"]
 }
+
+variable "vms" {
+  description = "Map of VM configurations"
+
+  type = map(object({
+    cores     = number
+    memory    = number
+    disk_size = number
+  }))
+
+  default = {
+    "app-server" = {
+      cores     = 2
+      memory    = 2
+      disk_size = 20
+    }
+    "ci-server" = {
+      cores     = 2
+      memory    = 4
+      disk_size = 30
+    }
+  }
+}

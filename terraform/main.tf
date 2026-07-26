@@ -67,9 +67,12 @@ resource "yandex_vpc_security_group" "sg_app" {
 resource "local_file" "ansible_inventory" {
   content  = <<-EOT
   [app_nodes]
-  ${yandex_compute_instance.app_node.network_interface.0.nat_ip_address}
+  ${yandex_compute_instance.node["app-server"].network_interface.0.nat_ip_address}
 
-  [app_nodes:vars]
+  [ci_nodes]
+  ${yandex_compute_instance.node["ci-server"].network_interface.0.nat_ip_address}
+
+  [all:vars]
   ansible_user = ubuntu
   ansible_python_interpreter=/usr/bin/python3
   ansible_ssh_private_key_file = ${var.ssh_private_key}
