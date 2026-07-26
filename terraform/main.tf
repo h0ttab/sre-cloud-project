@@ -64,6 +64,18 @@ resource "yandex_vpc_security_group" "sg_app" {
   }
 }
 
+resource "local_file" "ansible_inventory" {
+  content  = <<-EOT
+  [app_nodes]
+  ${yandex_compute_instance.app_node.network_interface.0.nat_ip_address}
+
+  [app_nodes:vars]
+  ansible_user = ubuntu
+  ansible_ssh_private_key_file = ${var.ssh_private_key}
+  EOT
+  filename = "${path.module}/../ansible/inventory.ini"
+}
+
 data "yandex_compute_image" "ubuntu_image" {
   family = var.ubuntu_family
 }

@@ -6,8 +6,14 @@ variable "service_account_key" {
 
 variable "ssh_public_key" {
   type        = string
-  description = "SSH-key filepath"
+  description = "Public SSH-key filepath"
   default     = "~/.ssh/yandex_cloud.pub"
+}
+
+variable "ssh_private_key" {
+  type        = string
+  description = "Private SSH-key filepath"
+  default     = "~/.ssh/yandex_cloud"
 }
 
 variable "cloud_id" {
