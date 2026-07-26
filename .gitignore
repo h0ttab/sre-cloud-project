@@ -6,3 +6,4 @@ questions.md
 *.tfstate
 *.tfstate.*
 *.tfvars
+ansible/*.ini

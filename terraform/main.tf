@@ -71,6 +71,7 @@ resource "local_file" "ansible_inventory" {
 
   [app_nodes:vars]
   ansible_user = ubuntu
+  ansible_python_interpreter=/usr/bin/python3
   ansible_ssh_private_key_file = ${var.ssh_private_key}
   EOT
   filename = "${path.module}/../ansible/inventory.ini"
