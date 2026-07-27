@@ -7,3 +7,4 @@ questions.md
 *.tfstate.*
 *.tfvars
 ansible/*.ini
+*password*

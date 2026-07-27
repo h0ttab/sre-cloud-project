@@ -19,17 +19,23 @@
 
 - name: Wait for Jenkins inital admin password to be generated
   wait_for:
-    path: "{{ jenkins_initial_password }}"
+    path: "{{ jenkins_password_file_remote }}"
     state: present
     timeout: 60
     
 
 - name: Get Jenkins admin password file content
-  command: "cat {{ jenkins_initial_password }}"
+  command: "cat {{ jenkins_password_file_remote }}"
   register: jenkins_password
   changed_when: false
 
+- name: Save Jenkins password to localhost
+  fetch:
+    src: "{{ jenkins_password_file_remote }}"
+    dest: "{{ jenkins_password_file_local }}"
+    flat: True
+    state: file
+
 - name: Display Jenkins password
   debug:
-    msg: "Jenkins server {{ ansible_host }} initial administrator password: {{ jenkins_password.stdout }}"
-    
+    msg: "Jenkins server {{ ansible_host }} initial administrator password: {{ jenkins_password.stdout }}\nSaved to {{ jenkins_password_file_local }}"
