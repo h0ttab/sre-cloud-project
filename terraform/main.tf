@@ -60,7 +60,7 @@ resource "yandex_vpc_security_group" "sg_app" {
   egress {
     description    = "Allow ALL"
     protocol       = "ANY"
-    v4_cidr_blocks = flatten([local.localhost_public_ip, local.cloud_subnets])
+    v4_cidr_blocks = ["0.0.0.0/0"]
   }
 }
 
