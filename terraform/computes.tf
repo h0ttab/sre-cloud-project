@@ -56,3 +56,7 @@ locals {
     }
   }
 }
+
+data "yandex_compute_image" "ubuntu_image" {
+  family = var.ubuntu_family
+}

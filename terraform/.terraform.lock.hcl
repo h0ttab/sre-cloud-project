@@ -1,6 +1,13 @@
 # This file is maintained automatically by "terraform init".
 # Manual edits may be lost in future updates.
 
+provider "registry.terraform.io/hashicorp/http" {
+  version = "3.6.0"
+  hashes = [
+    "h1:ligOpkIiBTS1ZkLoFp3cwkRYCwYyaZj1Z7t3GdfNa+c=",
+  ]
+}
+
 provider "registry.terraform.io/hashicorp/local" {
   version     = "2.9.0"
   constraints = "2.9.0"

@@ -40,27 +40,27 @@ resource "yandex_vpc_security_group" "sg_app" {
     description    = "Allow SSH"
     protocol       = "TCP"
     port           = 22
-    v4_cidr_blocks = ["0.0.0.0/0"]
+    v4_cidr_blocks = flatten([local.localhost_public_ip, local.cloud_subnets])
   }
 
   ingress {
     description    = "Allow HTTP:80"
     protocol       = "TCP"
     port           = 80
-    v4_cidr_blocks = ["0.0.0.0/0"]
+    v4_cidr_blocks = flatten([local.localhost_public_ip, local.cloud_subnets])
   }
 
   ingress {
     description    = "Allow HTTP:8080"
     protocol       = "TCP"
     port           = 8080
-    v4_cidr_blocks = ["0.0.0.0/0"]
+    v4_cidr_blocks = flatten([local.localhost_public_ip, local.cloud_subnets])
   }
 
   egress {
     description    = "Allow ALL"
     protocol       = "ANY"
-    v4_cidr_blocks = ["0.0.0.0/0"]
+    v4_cidr_blocks = flatten([local.localhost_public_ip, local.cloud_subnets])
   }
 }
 
@@ -74,7 +74,7 @@ resource "yandex_vpc_security_group" "sg_ci" {
     description    = "Allow Jenkins agents"
     protocol       = "TCP"
     port           = 50000
-    v4_cidr_blocks = concat(var.cidr_a, var.cidr_b)
+    v4_cidr_blocks = local.cloud_subnets
   }
 }
 
@@ -94,6 +94,12 @@ resource "local_file" "ansible_inventory" {
   filename = "${path.module}/../ansible/inventory.ini"
 }
 
-data "yandex_compute_image" "ubuntu_image" {
-  family = var.ubuntu_family
+locals {
+  localhost_public_ip = "${chomp(data.http.public_ip.response_body)}/32"
+  cloud_subnets = concat(var.cidr_a, var.cidr_b)
+  
+}
+
+data "http" "public_ip" {
+  url = "https://checkip.amazonaws.com"
 }
