@@ -16,3 +16,20 @@
   command: "docker compose up -d"
   args:
     chdir: /opt/jenkins
+
+- name: Wait for Jenkins inital admin password to be generated
+  wait_for:
+    path: "{{ jenkins_initial_password }}"
+    state: present
+    timeout: 60
+    
+
+- name: Get Jenkins admin password file content
+  command: "cat {{ jenkins_initial_password }}"
+  register: jenkins_password
+  changed_when: false
+
+- name: Display Jenkins password
+  debug:
+    msg: "Jenkins server {{ ansible_host }} initial administrator password: {{ jenkins_password.stdout }}"
+    

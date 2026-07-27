@@ -1,3 +1,4 @@
 #SPDX-License-Identifier: MIT-0
 ---
 # vars file for role/jenkins
+jenkins_initial_password: /opt/jenkins_data/secrets/initialAdminPassword
