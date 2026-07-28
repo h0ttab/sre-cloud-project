@@ -40,3 +40,10 @@
     name: docker
     state: started
     enabled: yes
+
+- name: Add user to docker group
+  user:
+    name: ubuntu
+    groups:
+      - docker
+    append: True

@@ -6,28 +6,46 @@
     path: /opt/jenkins
     state: directory
     mode: 0755
+  register: jenkins_dir
+
+- name: Check if Jenkins is already initialized
+  stat:
+    path: "{{ jenkins_dir.path }}/installed"
+  register: jenkins_installed_flag
+
+- name: Ensure jenkins docker-compose file exists
+  stat:
+    path: "{{ jenkins_dir.path }}/docker-compose.yaml"
+  register: compose_file
 
 - name: Copy docker-compose.yaml to Jenkins directory on the server
   copy:
     src: "docker-compose.yaml"
-    dest: "/opt/jenkins/docker-compose.yaml"
+    dest: "{{ jenkins_dir.path }}/docker-compose.yaml"
+  when: not compose_file.stat.exists
 
 - name: Start Jenkins container
-  command: "docker compose up -d"
-  args:
-    chdir: /opt/jenkins
+  community.docker.docker_compose_v2:
+    project_src: "{{ jenkins_dir.path }}"
 
 - name: Wait for Jenkins inital admin password to be generated
   wait_for:
     path: "{{ jenkins_password_file_remote }}"
     state: present
-    timeout: 60
-    
+    timeout: 30
+  failed_when: False
+  when: not jenkins_installed_flag.stat.exists
+
+- name: Ensure Jenkins password file exists
+  stat:
+    path: "{{ jenkins_password_file_remote }}"
+  register: password_file
 
 - name: Get Jenkins admin password file content
   command: "cat {{ jenkins_password_file_remote }}"
   register: jenkins_password
   changed_when: false
+  when: not jenkins_installed_flag.stat.exists
 
 - name: Save Jenkins password to localhost
   fetch:
@@ -35,7 +53,14 @@
     dest: "{{ jenkins_password_file_local }}"
     flat: True
     state: file
+  when: not jenkins_installed_flag.stat.exists
 
 - name: Display Jenkins password
   debug:
     msg: "Jenkins server {{ ansible_host }} initial administrator password: {{ jenkins_password.stdout }}\nSaved to {{ jenkins_password_file_local }}"
+  when: not jenkins_installed_flag.stat.exists
+
+- name: Set Jenkins successful installation flag
+  file:
+    path: "{{ jenkins_dir.path }}/installed"
+    state: touch
