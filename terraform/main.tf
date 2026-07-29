@@ -1,12 +1,3 @@
-resource "yandex_container_registry" "container_registry" {
-  folder_id = var.folder_id
-  name      = "container-registry"
-
-  labels = {
-    managed_by = "terraform"
-  }
-}
-
 resource "local_file" "ansible_inventory" {
   content  = <<-EOT
   [app_nodes]
@@ -26,10 +17,6 @@ resource "local_file" "ansible_inventory" {
 locals {
   localhost_public_ip = "${chomp(data.http.public_ip.response_body)}/32"
   cloud_subnets       = concat(var.cidr_a, var.cidr_b)
-}
-
-output "container_registry_id" {
-  value = "Yandex Container Registry ID: ${yandex_container_registry.container_registry.id}"
 }
 
 data "http" "public_ip" {
