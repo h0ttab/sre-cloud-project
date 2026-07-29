@@ -16,6 +16,6 @@ terraform {
 }
 
 provider "yandex" {
-  service_account_key_file = pathexpand(var.service_account_key)
+  service_account_key_file = pathexpand(var.terraform_sa_key)
   zone                     = var.zone_a
 }
