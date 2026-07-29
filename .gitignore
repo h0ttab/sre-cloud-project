@@ -1,10 +1,9 @@
 notes.md
 questions.md
-*key.json
 *facts.json
 .terraform/
 *.tfstate
 *.tfstate.*
 *.tfvars
 ansible/*.ini
-*password*
+secrets/
