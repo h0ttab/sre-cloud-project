@@ -7,3 +7,4 @@ questions.md
 *.tfvars
 ansible/*.ini
 secrets/
+vault_reset.sh
