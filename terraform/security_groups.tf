@@ -44,4 +44,18 @@ resource "yandex_vpc_security_group" "sg_ci" {
     port           = 50000
     v4_cidr_blocks = local.cloud_subnets
   }
+
+  ingress {
+    description    = "Allow HashiCorp Vault API port"
+    protocol       = "TCP"
+    port           = 8200
+    v4_cidr_blocks = flatten([local.localhost_public_ip, local.cloud_subnets])
+  }
+
+  ingress {
+    description    = "Allow HashiCorp Vault cluster internal port"
+    protocol       = "TCP"
+    port           = 8201
+    v4_cidr_blocks = local.cloud_subnets
+  }
 }

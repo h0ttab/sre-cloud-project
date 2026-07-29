@@ -1,0 +1,17 @@
+services:
+  vault:
+    image: "hashicorp/vault:latest"
+    restart: unless-stopped
+    container_name: vault
+    ports:
+    - "8200:8200"
+    cap_add:
+      - IPC_LOCK
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    command: vault server -config=/vault/config/vault.hcl
+    volumes:
+      - /opt/vault_data/config/vault.hcl:/vault/config/vault.hcl
+      - /opt/vault_data/file:/vault/file

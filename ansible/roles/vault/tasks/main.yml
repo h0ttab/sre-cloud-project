@@ -1,0 +1,31 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for roles/vault
+- name: Create Vault directories
+  file:
+    path: "{{ item }}"
+    mode: 0755
+    owner: 100 # Vault's internal user UID
+    group: 100 # # Vault's internal user GID
+    state: directory
+  loop:
+    - "{{ vault_home }}/file"
+    - "{{ vault_home }}/config"
+
+- name: Copy docker-compose and config files to Vault directory on the server
+  copy:
+    src: "{{ item.value.src }}"
+    dest: "{{ item.value.dest }}"
+  loop: "{{ files | dict2items }}"
+  vars:
+    files:
+      docker:
+        src: docker-compose.yaml
+        dest: "{{ vault_home }}/docker-compose.yaml"
+      config:
+        src: config.hcl
+        dest: "{{ vault_home }}/config/vault.hcl"
+
+- name: Start Vault container
+  community.docker.docker_compose_v2:
+    project_src: "{{ vault_home }}"

@@ -1,7 +1,7 @@
 resource "yandex_vpc_network" "vpc_net" {
   name      = "cloud_network"
   folder_id = var.folder_id
-  
+
   labels = {
     managed_by = "terraform"
   }
