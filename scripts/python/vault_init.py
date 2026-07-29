@@ -56,7 +56,7 @@ def unseal_vault(key):
     data = response.json()
 
     if "errors" in data or "sealed" not in data:
-        raise Exception(f"Error while unsealing Vault: {data["errors"]}")
+        raise Exception(f"Error while unsealing Vault: {data['errors']}")
 
 
 if __name__ == "__main__":
