@@ -6,6 +6,7 @@
     pkg: "{{ required_packages.gpg }}"
     state: present
     update_cache: yes
+    timeout: 90
 
 - name: Create keyrings directory
   file:
@@ -18,6 +19,7 @@
     url: "{{ docker_gpg_key_url }}"
     dest: "{{ keyring_path }}/docker.asc"
     mode: 0444
+    timeout: 30
 
 - name: Install Docker APT repository
   deb822_repository:
@@ -34,6 +36,7 @@
     name: "{{ required_packages.docker }}"
     state: present
     update_cache: yes
+    timeout: 120
 
 - name: Ensure Docker service is running
   service:

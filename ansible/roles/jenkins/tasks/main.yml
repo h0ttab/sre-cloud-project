@@ -41,6 +41,7 @@
     dest: "{{ jenkins_password_file_local }}"
     flat: True
     state: file
+    timeout: 30
   when: not jenkins_installed_flag.stat.exists and password_file.stat.exists
 
 - name: Notify when Jenkins password file is successfully fetched
