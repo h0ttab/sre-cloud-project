@@ -52,3 +52,4 @@
   file:
     path: "{{ jenkins_dir.path }}/installed"
     state: touch
+  when: not jenkins_installed_flag.stat.exists
