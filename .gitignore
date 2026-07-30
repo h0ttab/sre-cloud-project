@@ -8,3 +8,4 @@ questions.md
 ansible/*.ini
 secrets/
 vault_reset.sh
+diff.txt
