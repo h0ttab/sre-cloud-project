@@ -5,7 +5,7 @@
   file:
     path: /opt/jenkins
     state: directory
-    mode: 0755
+    mode: '0755'
   register: jenkins_dir
 
 - name: Check if Jenkins is already initialized

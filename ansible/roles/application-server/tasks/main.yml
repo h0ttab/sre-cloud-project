@@ -1,0 +1,10 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for roles/application-server
+- name: Create app deployment directory
+  file:
+    path: "{{ application_directory_path }}"
+    state: directory
+    mode: '0755'
+    owner: "{{ application_directory_owner }}"
+    group: "{{ application_directory_group }}"
