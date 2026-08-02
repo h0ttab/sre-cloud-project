@@ -13,87 +13,89 @@ args = arg_parser.parse_args()
 VAULT_IP = args.host
 VAULT_PORT = args.port
 VAULT_INIT_FILE_PATH = './secrets/vault_bootstrap_keys.json'
-VAULT_API_URL = f"http://{VAULT_IP}:{VAULT_PORT}/v1"
+VAULT_API_URL = f'http://{VAULT_IP}:{VAULT_PORT}/v1'
 
 SECRET_SHARES = 12
 SECRET_THRESHOLD = 10
 
 
 def get_initialization_status() -> bool:
-    log.info("Fetching Vault initialization status...")
-    r = requests.get(url=f"{VAULT_API_URL}/sys/init")
+    log.info('Fetching Vault initialization status...')
+    r = requests.get(url=f'{VAULT_API_URL}/sys/init')
     data = r.json()
-    if "initialized" not in data:
-        log.error(f"Vault initialization status is unknown. Response from the server: {data}")
+    if 'initialized' not in data:
+        log.error(f'Vault initialization status is unknown. Response from the server: {data}')
         exit(1)
-    return data["initialized"]
+    return data['initialized']
 
 
 def initialize_vault(initialized: bool) -> None:
     if initialized:
-        log.info("Vault is already initialized")
+        log.info('Vault is already initialized')
         return
 
-    log.info("Vault is not initialized. Initializing now...")
+    log.info('Vault is not initialized. Initializing now...')
 
     payload = {
-        "secret_shares": SECRET_SHARES,
-        "secret_threshold": SECRET_THRESHOLD
+        'secret_shares': SECRET_SHARES,
+        'secret_threshold': SECRET_THRESHOLD
     }
 
-    log.info("Sending initialization request")
-    r = requests.post(f"{VAULT_API_URL}/sys/init", json=payload)
+    log.info('Sending initialization request')
+    r = requests.post(f'{VAULT_API_URL}/sys/init', json=payload)
     r_json = r.json()
 
-    if "errors" in r_json:
-        log.error(f"Error while initializing Vault: {r_json['errors']}")
+    if 'errors' in r_json:
+        log.error(f'Error while initializing Vault: {r_json['errors']}')
         exit(1)
 
-    data = json.dumps(r.json(), indent=4, sort_keys=True)
-    with open(VAULT_INIT_FILE_PATH, "w") as file:
+    data = json.dumps(r_json, indent=4, sort_keys=True)
+    with open(VAULT_INIT_FILE_PATH, 'w') as file:
         file.write(data)
-    log.info(f"Vault initialized! Bootstrap keys saved to {VAULT_INIT_FILE_PATH}")
+    with open('./secrets/vault_root_token', 'w') as file:
+        file.write(r_json['root_token'])
+    log.info(f'Vault initialized! Bootstrap keys saved to {VAULT_INIT_FILE_PATH}')
 
 
 def get_seal_status() -> bool:
-    log.info("Fetching Vault seal status")
-    r = requests.get(f"{VAULT_API_URL}/sys/seal-status")
+    log.info('Fetching Vault seal status')
+    r = requests.get(f'{VAULT_API_URL}/sys/seal-status')
     data = r.json()
-    if "sealed" not in data:
-        log.error(f"Vault seal status is unknown. Response: {data}")
+    if 'sealed' not in data:
+        log.error(f'Vault seal status is unknown. Response: {data}')
         exit(1)
-    return data["sealed"]
+    return data['sealed']
 
 
 def get_bootstrap_keys(path: str) -> list[str]:
-    log.info("Loading Vault keys...")
-    with open(path, "r") as file:
+    log.info('Loading Vault keys...')
+    with open(path, 'r') as file:
         data = file.read()
         return json.loads(data)
 
 
 def unseal_vault(secret_share: str, share_index: int, shares_required: int, total_shares: int) -> None:
     log.info(
-        f"Unsealing Vault using secret share №{share_index} out of {shares_required} required. Total shares issued: {total_shares}")
+        f'Unsealing Vault using secret share №{share_index} out of {shares_required} required. Total shares issued: {total_shares}')
 
-    payload = json.dumps({"key": secret_share})
-    response = requests.put(f"{VAULT_API_URL}/sys/unseal", payload)
+    payload = json.dumps({'key': secret_share})
+    response = requests.put(f'{VAULT_API_URL}/sys/unseal', payload)
     data = response.json()
 
-    if "errors" in data or "sealed" not in data:
-        log.error(f"Error while unsealing Vault: {data['errors']}")
+    if 'errors' in data or 'sealed' not in data:
+        log.error(f'Error while unsealing Vault: {data['errors']}')
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     is_initialized = get_initialization_status()
     initialize_vault(is_initialized)
     seal_status = get_seal_status()
 
     if seal_status is False:
-        log.info("Vault is already unsealed. Exiting...")
+        log.info('Vault is already unsealed. Exiting...')
         exit(0)
 
-    secret_shares = get_bootstrap_keys(VAULT_INIT_FILE_PATH)["keys"]
+    secret_shares = get_bootstrap_keys(VAULT_INIT_FILE_PATH)['keys']
 
     i = 1
     for key in secret_shares:
@@ -104,6 +106,6 @@ if __name__ == "__main__":
             break
 
     if get_seal_status() is False:
-        log.info("Vault unsealed successfully. Exiting...")
+        log.info('Vault unsealed successfully. Exiting...')
     else:
-        log.error("Failed to unseal vault. Exiting...")
+        log.error('Failed to unseal vault. Exiting...')
