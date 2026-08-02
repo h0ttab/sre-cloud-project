@@ -1,27 +1,55 @@
 pipeline {
     agent any
-    
+
     parameters {
         string(name: 'APP_SERVER_IP', defaultValue:'10.10.1.18', description: 'Target server IP')
-    }
-
-    environment {
-        APP_NAME = 'test-web-app'
-        APP_VERSION = '1.30.4-alpine'
+        string(name: 'YCR_ID', defaultValue: 'crpe2to495vf01mivd2e', description: 'Yandex Container Registry ID')
+        string(name: 'APP_NAME', defaultValue: 'filmorate', description: 'App name')
+        string(name: 'APP_VERSION', defaultValue: '1.0', description: 'App version')
+        string(name: 'APP_PLATFORM', defaultValue: 'linux/amd64', description: 'App platform')
+        string(name: 'VAULT_IP', defaultValue: '10.10.1.26', description: 'Vault IP')
+        string(name: 'VAULT_PORT', defaultValue: '8200', description: 'Vault port')
     }
 
     stages {
-        stage("Deploy to app server") {
-            options {
-                timeout(time: 5, unit: 'MINUTES')
-            }
+        stage("Build Image") {
             steps {
-                sshagent(credentials: ['app-node-ssh-key']){
-                    sh """
-                        ssh -o StrictHostKeyChecking=no ubuntu@$APP_SERVER_IP 'docker stop $APP_NAME || true; docker rm $APP_NAME || true; docker run -d --name $APP_NAME -p 80:80 nginx:$APP_VERSION'
-                    """
+                sh "docker buildx build --platform ${params.APP_PLATFORM} -t cr.yandex/${params.YCR_ID}/${params.APP_NAME}:${params.APP_VERSION} ."
+            }
+        }
+
+        stage("Push Image") {
+            steps {
+                script {
+                    def secrets = [
+                        [
+                            path: 'secret/jenkins/ycr',
+                            engineVersion: 2,
+                            secretValues: [
+                                [envVar: 'YCR_KEY', vaultKey: 'key.json']
+                            ]
+                        ]
+                    ]
+
+                    def configuration = [
+                        vaultUrl: "http://${params.VAULT_IP}:${params.VAULT_PORT}",
+                        vaultCredentialId: 'vault-approle',
+                        engineVersion: 2
+                    ]
+
+                    withVault(configuration: configuration, vaultSecrets: secrets) {
+                        sh 'printenv YCR_KEY | docker login --username json_key --password-stdin cr.yandex'
+                        sh "docker push --platform ${params.APP_PLATFORM} cr.yandex/${params.YCR_ID}/${params.APP_NAME}:${params.APP_VERSION}"
+                    }
                 }
             }
+        }
+    }
+
+    post {
+        always {
+            sh 'docker image prune -af'
+            sh 'rm -rf ./*'
         }
     }
 }
