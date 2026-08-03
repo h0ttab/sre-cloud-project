@@ -1,9 +1,15 @@
 export VAULT_ADDR="http://$1:8200"
 export VAULT_TOKEN=$(cat ./secrets/vault_root_token)
+
 vault secrets enable --path=secret kv-v2
+
+vault auth enable userpass
+vault auth enable approle
+
+vault policy write admin ./vault/admin_policy.hcl
 vault policy write jenkins ./vault/jenkins_policy.hcl
 
-vault auth enable approle
+vault write auth/userpass/users/$(sed -n '1p' ./secrets/vault_admin_credentials) password=$(sed -n '2p' ./secrets/vault_admin_credentials) policies="admin"
 vault write auth/approle/role/jenkins-role policies="jenkins"
 
 vault read auth/approle/role/jenkins-role/role-id > ./secrets/jenkins_approle
