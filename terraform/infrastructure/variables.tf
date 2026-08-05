@@ -18,8 +18,8 @@ variable "ssh_public_key" {
 
 variable "ssh_private_key" {
   type        = string
-  description = "Private SSH-key filepath"
-  default     = "../../secrets/ssh/cloud_ssh_key"
+  description = "Private SSH-key filepath for Ansible inventory.ini auto-generation"
+  default     = "../secrets/ssh/cloud_ssh_key"
 }
 
 variable "cloud_id" {

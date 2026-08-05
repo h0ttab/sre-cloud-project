@@ -5,7 +5,7 @@ variable "vault_server_ip" {
 }
 
 variable "ssh_private_key_path" {
-  type = string
+  type        = string
   description = "SSH private key filepath"
-  default = "../../secrets/ssh/cloud_ssh_key"
+  default     = "../../secrets/ssh/cloud_ssh_key"
 }
