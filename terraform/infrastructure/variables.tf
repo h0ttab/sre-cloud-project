@@ -13,13 +13,13 @@ variable "registry_sa_key" {
 variable "ssh_public_key" {
   type        = string
   description = "Public SSH-key filepath"
-  default     = "./secrets/ssh/cloud_ssh_key.pub"
+  default     = "../../secrets/ssh/cloud_ssh_key.pub"
 }
 
 variable "ssh_private_key" {
   type        = string
   description = "Private SSH-key filepath"
-  default     = "./secrets/ssh/cloud_ssh_key"
+  default     = "../../secrets/ssh/cloud_ssh_key"
 }
 
 variable "cloud_id" {

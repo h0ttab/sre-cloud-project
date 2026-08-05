@@ -32,7 +32,7 @@ resource "yandex_compute_instance" "node" {
 
   # YandexCloud required ssh-key to be passed in the format "{username}:{key_itself}"
   metadata = {
-    ssh-keys = "ubuntu:${file(pathexpand(var.ssh_public_key))}" # "ubuntu" - username, ${} - formatted string
+    ssh-keys = "ubuntu:${file(var.ssh_public_key)}" # "ubuntu" - username, ${} - formatted string
   }
 
   labels = {

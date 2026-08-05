@@ -9,13 +9,13 @@ resource "yandex_container_registry" "container_registry" {
 
 output "container_registry_id" {
   value = "Yandex Container Registry ID: ${yandex_container_registry.container_registry.id}"
-  
+
 }
 
 resource "yandex_container_repository" "container_repositories" {
   for_each = var.repositories
   name     = "${yandex_container_registry.container_registry.id}/${each.value}"
-  
+
 }
 
 variable "repositories" {
@@ -31,7 +31,7 @@ resource "yandex_container_repository_lifecycle_policy" "container_repository_li
   name          = "lifecycle-policy-${each.key}"
   repository_id = each.value.id
   status        = "active"
-  
+
 
   rule {
     description   = "Delete all untagged images and images older than 24h. Keep only two latest image."

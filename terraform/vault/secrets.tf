@@ -11,7 +11,7 @@ resource "vault_kv_secret_v2" "ssh_secret" {
   name  = "jenkins/ssh"
   mount = vault_mount.kvv2.path
   data_json_wo = jsonencode({
-    app-node-ssh-key      = file(pathexpand("./secrets/ssh/cloud_ssh_key"))
+    app-node-ssh-key      = file(var.ssh_private_key_path)
     app-node-ssh-username = "ubuntu"
   })
   data_json_wo_version = 1
