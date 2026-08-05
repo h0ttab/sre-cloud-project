@@ -12,7 +12,7 @@ terraform {
       version = "3.6.0"
     }
   }
-  required_version = ">= 0.13"
+  required_version = ">= 1.15.8"
 }
 
 provider "yandex" {

@@ -13,5 +13,3 @@ services:
       - /usr/bin/docker:/usr/bin/docker
       - /usr/local/bin/docker-compose:/usr/local/bin/docker-compose
       - /usr/libexec/docker/cli-plugins/:/usr/libexec/docker/cli-plugins/
-volumes:
-  jenkins_data:

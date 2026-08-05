@@ -11,7 +11,14 @@ resource "local_file" "ansible_inventory" {
   ansible_python_interpreter=/usr/bin/python3
   ansible_ssh_private_key_file = ${var.ssh_private_key}
   EOT
-  filename = "${path.module}/../ansible/inventory.ini"
+  filename = "${path.module}/../../ansible/inventory.ini"
+}
+
+resource "local_file" "vault_server_ip" {
+  content  = <<-EOT
+  vault_server_ip = "${yandex_compute_instance.node["ci-server"].network_interface.0.nat_ip_address}"
+  EOT
+  filename = "${path.module}/../vault/terraform.tfvars"
 }
 
 locals {

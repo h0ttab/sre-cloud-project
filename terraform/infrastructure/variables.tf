@@ -1,25 +1,25 @@
 variable "terraform_sa_key" {
   type        = string
   description = "Terraform service account JSON-key filepath"
-  default     = "../secrets/terraform-sa-key.json"
+  default     = "../../secrets/cloud/terraform-sa-key.json"
 }
 
 variable "registry_sa_key" {
   type        = string
   description = "Container Registry service account JSON-key filepath"
-  default     = "../secrets/container-registry-sa-key.json"
+  default     = "../../secrets/cloud/container-registry-sa-key.json"
 }
 
 variable "ssh_public_key" {
   type        = string
   description = "Public SSH-key filepath"
-  default     = "~/.ssh/yandex_cloud.pub"
+  default     = "./secrets/ssh/cloud_ssh_key.pub"
 }
 
 variable "ssh_private_key" {
   type        = string
   description = "Private SSH-key filepath"
-  default     = "~/.ssh/yandex_cloud"
+  default     = "./secrets/ssh/cloud_ssh_key"
 }
 
 variable "cloud_id" {

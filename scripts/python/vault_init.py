@@ -12,7 +12,7 @@ args = arg_parser.parse_args()
 
 VAULT_IP = args.host
 VAULT_PORT = args.port
-VAULT_INIT_FILE_PATH = './secrets/vault_bootstrap_keys.json'
+VAULT_INIT_FILE_PATH = './secrets/vault/vault_bootstrap_keys.json'
 VAULT_API_URL = f'http://{VAULT_IP}:{VAULT_PORT}/v1'
 
 SECRET_SHARES = 12
@@ -52,7 +52,7 @@ def initialize_vault(initialized: bool) -> None:
     data = json.dumps(r_json, indent=4, sort_keys=True)
     with open(VAULT_INIT_FILE_PATH, 'w') as file:
         file.write(data)
-    with open('./secrets/vault_root_token', 'w') as file:
+    with open('./secrets/vault/vault_root_token', 'w') as file:
         file.write(r_json['root_token'])
     log.info(f'Vault initialized! Bootstrap keys saved to {VAULT_INIT_FILE_PATH}')
 

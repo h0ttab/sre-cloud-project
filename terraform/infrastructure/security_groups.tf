@@ -4,6 +4,10 @@ resource "yandex_vpc_security_group" "sg_app" {
   folder_id   = var.folder_id
   network_id  = yandex_vpc_network.vpc_net.id
 
+  labels = {
+    managed_by = "terraform"
+  }
+
   ingress {
     description    = "Allow SSH"
     protocol       = "TCP"
@@ -37,6 +41,10 @@ resource "yandex_vpc_security_group" "sg_ci" {
   description = "CI node security group"
   folder_id   = var.folder_id
   network_id  = yandex_vpc_network.vpc_net.id
+
+  labels = {
+    managed_by = "terraform"
+  }
 
   ingress {
     description    = "Allow Jenkins agents"

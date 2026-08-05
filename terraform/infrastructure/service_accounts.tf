@@ -2,6 +2,10 @@ resource "yandex_iam_service_account" "registry_service_account" {
   folder_id   = var.folder_id
   name        = "container-registry-sa"
   description = "Container Registry service account"
+
+  labels = {
+    managed_by = "terraform"
+  }
 }
 
 resource "yandex_iam_service_account_key" "registry_sa_key" {

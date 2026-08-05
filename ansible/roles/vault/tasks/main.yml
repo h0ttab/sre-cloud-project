@@ -6,7 +6,7 @@
     path: "{{ item }}"
     mode: 0755
     owner: 100 # Vault's internal user UID
-    group: 100 # # Vault's internal user GID
+    group: 100 # Vault's internal user GID
     state: directory
   loop:
     - "{{ vault_home }}/file"
