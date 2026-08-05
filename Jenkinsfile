@@ -17,6 +17,7 @@ pipeline {
         SERVER_IMAGE = "cr.yandex/${env.YCR_ID}/shareit-server:${params.APP_VERSION}"
         GATEWAY_IMAGE = "cr.yandex/${env.YCR_ID}/shareit-gateway:${params.APP_VERSION}"
         APP_DIR_PATH = "${env.APP_DIR_BASE_PATH}/${params.APP_DIR_NAME}"
+        TEMP_SSH_KEY_PATH = "./ssh_key_temp"
     }
 
     stages {
@@ -51,7 +52,8 @@ pipeline {
                             path: 'secret/jenkins/ssh',
                             engineVersion: 2,
                             secretValues: [
-                                [envVar: 'SSH_USERNAME', vaultKey: 'app-node-ssh-username']
+                                [envVar: 'SSH_USERNAME', vaultKey: 'app-node-ssh-username'],
+                                [envVar: 'SSH_KEY', vaultKey: 'app-node-ssh-key']
                             ]
                         ],
                         [
@@ -70,15 +72,17 @@ pipeline {
                             ]
                         ]
                     ]) {
-                        sshagent(credentials: ['app-node-ssh']) {
-                            sh "ssh -o StrictHostKeyChecking=no ${env.SSH_USERNAME}@${env.APP_SERVER_IP} 'mkdir -p ${env.APP_DIR_PATH}'"
-                            sh "scp -o StrictHostKeyChecking=no ./docker-compose.yaml ${env.SSH_USERNAME}@${env.APP_SERVER_IP}:${env.APP_DIR_PATH}"
-                            sh "printenv YCR_KEY | ssh -o StrictHostKeyChecking=no ${env.SSH_USERNAME}@${env.APP_SERVER_IP} 'docker login --username json_key --password-stdin cr.yandex'"
+                            writeFile(file: "${env.TEMP_SSH_KEY_PATH}", text: env.SSH_KEY)
+                            sh "chmod 400 ${env.TEMP_SSH_KEY_PATH}"
+
+                            sh "ssh -i ${env.TEMP_SSH_KEY_PATH} -o StrictHostKeyChecking=no ${env.SSH_USERNAME}@${env.APP_SERVER_IP} 'mkdir -p ${env.APP_DIR_PATH}'"
+                            sh "scp -i ${env.TEMP_SSH_KEY_PATH} -o StrictHostKeyChecking=no ./docker-compose.yaml ${env.SSH_USERNAME}@${env.APP_SERVER_IP}:${env.APP_DIR_PATH}"
+                            sh "printenv YCR_KEY | ssh -i ${env.TEMP_SSH_KEY_PATH} -o StrictHostKeyChecking=no ${env.SSH_USERNAME}@${env.APP_SERVER_IP} 'docker login --username json_key --password-stdin cr.yandex'"
 
                             sh """
-                                ssh -o StrictHostKeyChecking=no ${env.SSH_USERNAME}@${env.APP_SERVER_IP} '
-                                    export DB_USER="${DB_USER}"
-                                    export DB_PASSWORD="${DB_PASSWORD}"
+                                ssh -i ${env.TEMP_SSH_KEY_PATH} -o StrictHostKeyChecking=no ${SSH_USERNAME}@${env.APP_SERVER_IP} '
+                                    export DB_USER="${env.DB_USER}"
+                                    export DB_PASSWORD="${env.DB_PASSWORD}"
                                     export SERVER_IMAGE=${env.SERVER_IMAGE}
                                     export GATEWAY_IMAGE=${env.GATEWAY_IMAGE}
 
@@ -92,7 +96,6 @@ pipeline {
                                     docker logout cr.yandex
                                 '
                             """
-                        }
                     }
             }
         }
@@ -100,6 +103,7 @@ pipeline {
 
     post {
         always {
+            sh "rm -f ${env.TEMP_SSH_KEY_PATH}"
             sh 'docker image prune -af'
             sh 'rm -rf ./*'
         }
